@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  email    String   @unique
+  password String
+  name     String
+  level    String   @default("customer") // 예: customer, admin
+  carts    Cart[]
+  orders   Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  sku         String   @unique
+  name        String
+  image       String
+  price       Int
+  description String
+  stock       Int
+  category    String[] // 여러 카테고리 가능하도록 배열 처리
+  status      String   @default("active")
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cart {
+  id     String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId String     @db.ObjectId
+  user   User       @relation(fields: [userId], references: [id])
+  items  CartItem[]
+}
+
+type CartItem {
+  productId String @db.ObjectId
+  size      String
+  qty       Int
+}
+
+model Order {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String      @db.ObjectId
+  user       User        @relation(fields: [userId], references: [id])
+  shipTo     Json        // 주소 정보 (객체 형태)
+  contact    Json        // 연락처 정보 (객체 형태)
+  totalPrice Int
+  status     String      @default("preparing")
+  items      OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+type OrderItem {
+  productId String @db.ObjectId
+  qty       Int    @default(1)
+  size      String
+  price     Int
+}
