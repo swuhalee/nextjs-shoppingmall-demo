@@ -16,9 +16,28 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing pages in the App Router under `app/(public)` and `app/(customer)`.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## MongoDB (Mongoose) Setup
+
+Set your MongoDB connection string in `.env`:
+
+```bash
+MONGODB_URI=mongodb://127.0.0.1:27017/shoppingmall
+```
+
+Use the shared connection helper:
+
+```ts
+import dbConnect from "@/lib/mongodb";
+
+export async function GET() {
+  await dbConnect();
+  return Response.json({ ok: true });
+}
+```
 
 ## Learn More
 
